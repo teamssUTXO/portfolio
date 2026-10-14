@@ -1,0 +1,5 @@
+ErrorDocument 404 /404.html
+
+<Files "opengraph-image">
+  ForceType image/png
+</Files>
