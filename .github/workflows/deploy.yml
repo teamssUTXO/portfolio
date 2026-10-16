@@ -1,4 +1,4 @@
-name: Deploy to Hostinger
+name: Deployment
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-hostinger
+  group: deployment
   cancel-in-progress: true
 
 jobs:
@@ -27,11 +27,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
-      - name: Upload via FTP
+      - name: FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
           local-dir: ./out/
           server-dir: /public_html/
