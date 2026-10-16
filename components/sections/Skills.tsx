@@ -2,9 +2,9 @@
 
 import { useRef } from "react";
 import { m, useScroll, useSpring, type MotionValue, type Variants } from "motion/react";
-import { ArrowUpRight, Award } from "lucide-react";
-import { type Certification, certifications } from "@/data/certifications";
+import { certifications } from "@/data/certifications";
 import { skillGroups } from "@/data/skills";
+import { CertificationCard } from "../CertificationCard";
 import { RevealItem, RevealList } from "../motion/Reveal";
 import { SectionHeader } from "../SectionHeader";
 import { headers } from "@/data/headers";
@@ -17,40 +17,6 @@ function ScrollRule({ progress }: { progress: MotionValue<number> }) {
     <div aria-hidden className="relative mt-3 h-px bg-line">
       <m.div style={{ scaleX: progress }} className="absolute inset-0 origin-left bg-fg" />
     </div>
-  );
-}
-
-function CertificationCard({ cert }: { cert: Certification }) {
-  const body = (
-    <>
-      <Award aria-hidden className="mt-0.5 size-4 shrink-0 text-dim transition-colors group-hover:text-fg" />
-      <div className="min-w-0 flex-1">
-        <p className="text-sm leading-snug text-fg">{cert.name}</p>
-        <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-dim">
-          {cert.issuer} · {cert.year}
-        </p>
-      </div>
-      {cert.href && (
-        <ArrowUpRight
-          aria-hidden
-          className="size-4 shrink-0 text-dim transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-fg"
-        />
-      )}
-    </>
-  );
-  const className = "group flex h-full items-start gap-3 rounded-2xl border border-line p-4 transition-colors duration-200";
-  return cert.href ? (
-    <a
-      href={cert.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`${cert.name}, ${cert.issuer} — view credential`}
-      className={`${className} hover:border-line-strong hover:bg-white/5`}
-    >
-      {body}
-    </a>
-  ) : (
-    <div className={className}>{body}</div>
   );
 }
 
