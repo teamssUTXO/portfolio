@@ -21,11 +21,31 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+
+      # TEMP: inspect what the FTP account sees, remove once deploy target is confirmed
+      - name: Debug FTP tree
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          ftp_ls() {
+            echo "=== /$1 ==="
+            curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$FTP_SERVER/$1" -l || echo "(not found)"
+          }
+          echo "=== login dir ==="
+          curl -sv --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$FTP_SERVER/" -l 2>&1 | grep -E '^< 257' || true
+          ftp_ls ""
+          ftp_ls "public_html/"
+          ftp_ls "public_html/_next/static/chunks/"
+          ftp_ls "domains/"
+          ftp_ls "domains/teamss.fr/"
+          ftp_ls "domains/teamss.fr/public_html/_next/static/chunks/"
 
       - name: FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
