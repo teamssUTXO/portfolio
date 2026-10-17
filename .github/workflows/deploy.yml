@@ -34,18 +34,15 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          ftp_ls() {
-            echo "=== /$1 ==="
-            curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$FTP_SERVER/$1" -l || echo "(not found)"
-          }
-          echo "=== login dir ==="
-          curl -sv --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" "ftp://$FTP_SERVER/" -l 2>&1 | grep -E '^< 257' || true
-          ftp_ls ""
-          ftp_ls "public_html/"
-          ftp_ls "public_html/_next/static/chunks/"
-          ftp_ls "domains/"
-          ftp_ls "domains/teamss.fr/"
-          ftp_ls "domains/teamss.fr/public_html/_next/static/chunks/"
+          ftp() { curl -s --ssl-reqd -k --user "$FTP_USERNAME:$FTP_PASSWORD" "$@"; }
+          echo "=== absolute root / ==="
+          ftp "ftp://$FTP_SERVER/%2F" -l || echo "(not found)"
+          echo "=== login dir: _next/static/chunks/ ==="
+          ftp "ftp://$FTP_SERVER/_next/static/chunks/" -l || echo "(not found)"
+          echo "=== login dir: index.html date ==="
+          ftp -I "ftp://$FTP_SERVER/index.html" | grep -i last-modified || true
+          echo "=== login dir: index.html issuer ==="
+          ftp "ftp://$FTP_SERVER/index.html" | grep -o '[A-Z]*<!-- --> · <!-- -->Expected' || true
 
       - name: FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
